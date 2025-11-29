@@ -1074,7 +1074,10 @@ begin
     begin
       Xml.Attributes.Clear();
       Xml.Attributes.Add('ref', FHyperLinks[i].CellRef);
-      Xml.Attributes.Add('r:id', 'rId' + IntToStr(FHyperLinks[i].RID));
+      if (FHyperLinks[i].target.StartsWith('http')) then
+        Xml.Attributes.Add('r:id', 'rId' + IntToStr(FHyperLinks[i].RID))
+      else
+        Xml.Attributes.Add('location', FHyperLinks[i].target);
 
       if (FHyperLinks[i].ScreenTip <> '') then
         Xml.Attributes.Add('tooltip', FHyperLinks[i].ScreenTip);
@@ -1119,8 +1122,13 @@ begin
     Xml.WriteTagNode('Relationships', true, true, false);
 
     for i := 0 to FHyperLinksCount - 1 do
-      ZEAddRelsRelation(Xml, 'rId' + IntToStr(FHyperLinks[i].RID), FHyperLinks[i].RelType, FHyperLinks[i].target,
-        FHyperLinks[i].TargetMode);
+    begin
+      if (FHyperLinks[i].target.StartsWith('http')) then
+      begin
+        ZEAddRelsRelation(Xml, 'rId' + IntToStr(FHyperLinks[i].RID), FHyperLinks[i].RelType, FHyperLinks[i].target,
+          FHyperLinks[i].TargetMode);
+      end;
+    end;
 
     Xml.WriteEndTagNode(); // Relationships
   finally
@@ -5506,9 +5514,12 @@ var
     Xml.Attributes.Add('filterMode', 'false');
     Xml.WriteTagNode('sheetPr', true, true, false);
 
-    Xml.Attributes.Clear();
-    Xml.Attributes.Add('rgb', 'FF' + ColorToHTMLHex(sheet.TabColor));
-    Xml.WriteEmptyTag('tabColor', true, false);
+    if (sheet.TabColor <> clNone) then
+    begin
+      Xml.Attributes.Clear();
+      Xml.Attributes.Add('rgb', 'FF' + ColorToHTMLHex(sheet.TabColor));
+      Xml.WriteEmptyTag('tabColor', true, false);
+    end;
 
     Xml.Attributes.Clear();
     if sheet.ApplyStyles then

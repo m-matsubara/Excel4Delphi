@@ -4008,7 +4008,7 @@ begin
   FDefaultColWidth := 48; // 60;
   FMergeCells := TZMergeCells.Create(Self);
   SetLength(FCells, FColCount);
-  FTabColor := TColorRec.cWindow;
+  FTabColor := clNone;
   FProtect := false;
   FRightToLeft := false;
   FSelected := false;
